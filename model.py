@@ -39,7 +39,7 @@ def inverse_transform_ipa_data(tensor, rotations, translations):
 
 
 
-def update_transformation_matrix(matrix, vector, rotations, translations):  # 函数名修改
+def update_transformation_matrix(matrix, vector, rotations, translations): 
     transformed_matrix = torch.einsum('bja,bad->bjd', matrix, rotations)
     transformed_vector = torch.einsum('ba,bad->bd', vector, rotations) + translations
     return transformed_matrix, transformed_vector
@@ -157,35 +157,34 @@ class MSAOuterProductMean(nn.Module):
 
 
 
-class MSAInitializer(nn.Module):  # Changed class name for clarity
+class MSAInitializer(nn.Module): 
     def __init__(self, sequence_dim, msa_input_dim, msa_embedding_dim, pairwise_dim):
         super().__init__()
         self.msalinear = LinearProjector(msa_input_dim, msa_embedding_dim)
         self.qlinear = LinearProjector(sequence_dim, pairwise_dim)
         self.klinear = LinearProjector(sequence_dim, pairwise_dim)
         self.slinear = LinearProjector(sequence_dim, msa_embedding_dim)
-        self.pos = self._generate_pairwise_positional_encoding().float()  # Changed method name
-        self.pos1d = self._generate_1d_positional_encoding()              # Changed method name
+        self.pos = self._generate_pairwise_positional_encoding().float()  
+        self.pos1d = self._generate_1d_positional_encoding()             
         self.poslinear = LinearProjector(65, pairwise_dim)
         self.poslinear2 = LinearProjector(14, msa_embedding_dim)
 
-    def move_module_to_device(self, device):  # Changed method name
+    def move_module_to_device(self, device):  
         self.to(device)
         self.pos.to(device)
 
-    def _generate_1d_positional_encoding(self, max_length=2000):  # Changed method name and parameter name
+    def _generate_1d_positional_encoding(self, max_length=2000):  
         position_indices = torch.arange(max_length)
         num_bits = 14
         binary_encoding = (((position_indices[:, None] & (1 << np.arange(num_bits)))) > 0).float()
         return binary_encoding
 
-    def _generate_pairwise_positional_encoding(self, max_length=2000):  # Changed method name and parameter name
+    def _generate_pairwise_positional_encoding(self, max_length=2000):  
         indices = torch.arange(max_length)
         pairwise_diff = (indices[None, :] - indices[:, None]).clamp(-32, 32)
         return F.one_hot(pairwise_diff + 32, 65)
 
-    def forward(self, sequence_input, msa_input):  # Changed parameter names
-        # Local variable names changed for clarity
+    def forward(self, sequence_input, msa_input):  
         if self.pos.device != msa_input.device:
             self.pos = self.pos.to(msa_input.device)
         if self.pos1d.device != msa_input.device:
@@ -239,7 +238,6 @@ def create_fourier_positional_encodings(x, num_encodings=20, include_self=True):
 
 
 class RecyclingEmbedder(nn.Module):
-    """RecyclingEmbedder with significant implementation differences"""
     def __init__(
         self, 
         feature_dim: int, 
@@ -294,19 +292,15 @@ class PairwiseFeatureConstructor(nn.Module):
         super().__init__()
         self.projection_dim = projection_dim
         
-        # Feature normalization layers
         self.norm = nn.LayerNorm(feature_dim)
         self.onorm = nn.LayerNorm(projection_dim)
         
-        # Projection layers
         self.alinear = LinearProjector(feature_dim, projection_dim)
         self.blinear = LinearProjector(feature_dim, projection_dim)
         
-        # Gating layers
         self.aglinear = LinearProjector(feature_dim, projection_dim)
         self.bglinear = LinearProjector(feature_dim, projection_dim)
         
-        # Output processing layers
         self.olinear = LinearProjector(projection_dim, feature_dim)
         self.glinear = LinearProjector(feature_dim, feature_dim)
 
@@ -930,7 +924,7 @@ class StructureModule(nn.Module):
         """Compute intermediate features"""
         ipa_output = self.ipa(sequence_features, pair_features, rotations, translations)
         features = sequence_features + ipa_output
-        transition_output = self.transition(features)  # 添加残差连接
+        transition_output = self.transition(features)  
         return transition_output
 
     def apply_layer_transform(

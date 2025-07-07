@@ -9,26 +9,13 @@ import psutil
 import model as model_py
 import os
 from utils import split_file_path,parse_seq,Get_base,extract_solorna_data,outpdb_coor
-from config import wordcwd,max_len,msa_dim, N_ensemble, N_cycle, m_dim, z_dim, s_dim,device
+from config import wordcwd,max_len,msa_dim, N_ensemble, N_cycle, m_dim, z_dim, s_dim,device,ARENA_BIN_PATH,checkpoint_path,pre_in_dir,pre_out_dir
 import numpy as np
 import torch
 from torch.nn import functional as F
 
 
 
-ARENA_BIN_PATH = os.path.join(wordcwd,"Arena")
-WORKING_DIR = os.path.join(wordcwd,"work")
-
-
-
-
-
-
-# ========== 配置参数 ==========
-#Please configure the corresponding parameters
-checkpoint_path = "/repository/users/lujw/solomodel/checkpoint_epoch_200drnewlosstrain102026.pth"
-pre_in_dir = os.path.join(os.getcwd(),"valid")
-pre_out_dir = os.path.join(os.getcwd(),"out")
 
 
 
